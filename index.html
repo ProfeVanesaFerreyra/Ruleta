@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Actividad Integradora Investigación - Prof. Vanesa Ferreyra</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+    :root {
+        --bg1: #f7f1ff;
+        --bg2: #eafaf6;
+        --primary: #6b4fd8;
+        --secondary: #12a386;
+        --danger: #d94b4b;
+        --text: #222;
+        --muted: #666;
+        --card: rgba(255,255,255,.94);
+        --number-bg: #fff4d6;
+        --number-border: #f2b705;
+    }
+    * { box-sizing: border-box; }
+    body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: Arial, Helvetica, sans-serif;
+        background: radial-gradient(circle at top left, var(--bg1), var(--bg2));
+        color: var(--text);
+        padding: 22px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .wrap {
+        width: min(100%, 1180px);
+        text-align: center;
+    }
+    .card {
+        background: var(--card);
+        border-radius: 26px;
+        box-shadow: 0 12px 36px rgba(0,0,0,.16);
+        padding: 26px;
+    }
+    h1 {
+        margin: 0;
+        color: var(--primary);
+        font-size: clamp(1.8rem, 4vw, 3rem);
+        letter-spacing: .2px;
+    }
+    h2 {
+        margin: 8px 0 20px;
+        color: var(--secondary);
+        font-size: clamp(1.1rem, 2.4vw, 1.6rem);
+        font-weight: 700;
+    }
+    .main-area {
+        display: grid;
+        grid-template-columns: minmax(420px, 1fr) 410px;
+        gap: 28px;
+        align-items: center;
+        justify-content: center;
+    }
+    .wheel-area {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+    .pointer {
+        width: 0;
+        height: 0;
+        border-left: 22px solid transparent;
+        border-right: 22px solid transparent;
+        border-top: 42px solid var(--danger);
+        margin-bottom: -22px;
+        z-index: 10;
+        filter: drop-shadow(0 2px 3px rgba(0,0,0,.25));
+    }
+    .wheel-box {
+        position: relative;
+        width: min(54vw, 540px);
+        height: min(54vw, 540px);
+        min-width: 420px;
+        min-height: 420px;
+    }
+    #wheel {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        border: 10px solid #fff;
+        box-shadow: 0 10px 28px rgba(0,0,0,.25);
+        position: relative;
+        overflow: hidden;
+        transition: transform 4s cubic-bezier(.12,.82,.18,1);
+    }
+    .label {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform-origin: 0 0;
+        width: 215px;
+        white-space: nowrap;
+        font-size: clamp(10px, 1.2vw, 13px);
+        font-weight: 800;
+        color: #121212;
+        text-shadow: 0 1px 2px rgba(255,255,255,.9);
+        pointer-events: none;
+    }
+    .center {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: min(14vw, 100px);
+        height: min(14vw, 100px);
+        min-width: 78px;
+        min-height: 78px;
+        border-radius: 50%;
+        background: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 900;
+        color: var(--primary);
+        box-shadow: 0 4px 12px rgba(0,0,0,.25);
+        z-index: 5;
+        padding: 10px;
+    }
+    button {
+        border: none;
+        border-radius: 16px;
+        padding: 13px 18px;
+        font-size: 1rem;
+        font-weight: 800;
+        cursor: pointer;
+        margin: 6px;
+        transition: transform .1s ease, opacity .2s ease;
+    }
+    button:hover { transform: translateY(-1px); }
+    button:disabled {
+        opacity: .5;
+        cursor: not-allowed;
+        transform: none;
+    }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-secondary { background: var(--secondary); color: white; }
+    .btn-danger { background: var(--danger); color: white; }
+    .btn-light { background: #efefef; color: #333; }
+    .result {
+        background: #f8f7ff;
+        border-left: 8px solid var(--primary);
+        border-radius: 22px;
+        padding: 24px 22px;
+        min-height: 420px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        text-align: left;
+    }
+    .mini {
+        color: var(--muted);
+        font-size: 1rem;
+        font-weight: 700;
+    }
+    .student {
+        color: var(--primary);
+        font-size: clamp(2rem, 4vw, 3.05rem);
+        line-height: 1.05;
+        font-weight: 900;
+        margin: 10px 0 14px;
+        word-break: keep-all;
+    }
+    .question-title {
+        margin-top: 10px;
+        color: var(--muted);
+        font-size: 1rem;
+        font-weight: 800;
+    }
+    .numbers {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin: 12px 0 18px;
+    }
+    .number-chip {
+        width: 92px;
+        height: 76px;
+        border-radius: 20px;
+        background: var(--number-bg);
+        border: 3px solid var(--number-border);
+        color: #2a2a2a;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.45rem;
+        font-weight: 900;
+        box-shadow: 0 4px 10px rgba(0,0,0,.12);
+    }
+    .timer-label {
+        color: var(--muted);
+        font-size: 1rem;
+        font-weight: 800;
+        margin-top: 4px;
+    }
+    .timer {
+        color: var(--danger);
+        font-size: clamp(2.8rem, 6.5vw, 4.7rem);
+        line-height: 1;
+        font-weight: 900;
+        margin: 7px 0 12px;
+        font-variant-numeric: tabular-nums;
+    }
+    .timer-ended { animation: pulse 1s infinite alternate; }
+    @keyframes pulse {
+        from { transform: scale(1); opacity: 1; }
+        to { transform: scale(1.04); opacity: .72; }
+    }
+    .timer-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        align-items: center;
+        margin-bottom: 8px;
+    }
+    .count {
+        display: inline-block;
+        margin-top: 12px;
+        background: #eeeeee;
+        border-radius: 999px;
+        padding: 10px 16px;
+        color: #444;
+        font-weight: 800;
+        text-align: center;
+        width: fit-content;
+    }
+    details {
+        margin: 22px auto 0;
+        max-width: 940px;
+        text-align: left;
+        background: rgba(255,255,255,.72);
+        border-radius: 16px;
+        padding: 12px 16px;
+    }
+    summary {
+        cursor: pointer;
+        font-weight: 800;
+        color: var(--primary);
+    }
+    ol {
+        columns: 2;
+        padding-left: 24px;
+    }
+    li { margin: 6px 0; }
+    .done {
+        text-decoration: line-through;
+        color: #999;
+    }
+    .footer {
+        color: var(--muted);
+        font-size: .9rem;
+        margin-top: 16px;
+    }
+    @media (max-width: 980px) {
+        body { padding: 10px; }
+        .card { padding: 16px; }
+        .main-area {
+            grid-template-columns: 1fr;
+            gap: 18px;
+        }
+        .wheel-box {
+            width: min(82vw, 520px);
+            height: min(82vw, 520px);
+            min-width: 310px;
+            min-height: 310px;
+        }
+        .result {
+            text-align: center;
+            min-height: 320px;
+        }
+        .numbers, .timer-buttons { justify-content: center; }
+        .count {
+            margin-left: auto;
+            margin-right: auto;
+        }
+        ol { columns: 1; }
+        .label { width: 170px; }
+    }
+</style>
+</head>
+<body>
+<div class="wrap">
+    <div class="card">
+        <h1>Actividad Integradora Investigación</h1>
+        <h2>Prof. Vanesa Ferreyra</h2>
+
+        <div class="main-area">
+            <div class="wheel-area">
+                <div class="pointer"></div>
+                <div class="wheel-box">
+                    <div id="wheel"></div>
+                    <div class="center">GIRAR</div>
+                </div>
+
+                <div>
+                    <button class="btn-primary" id="spinBtn">Girar ruleta</button>
+                    <button class="btn-light" id="resetBtn">Reiniciar ronda</button>
+                </div>
+            </div>
+
+            <div class="result">
+                <div class="mini">Estudiante seleccionado/a</div>
+                <div class="student" id="studentName">Presioná “Girar ruleta”</div>
+
+                <div class="question-title">Números de preguntas</div>
+                <div class="numbers" id="questionNumbers">
+                    <div class="number-chip">--</div>
+                    <div class="number-chip">--</div>
+                    <div class="number-chip">--</div>
+                </div>
+
+                <div class="timer-label">Tiempo de respuesta</div>
+                <div class="timer" id="timer">03:00</div>
+
+                <div class="timer-buttons">
+                    <button class="btn-secondary" id="startTimerBtn" disabled>Iniciar 3 minutos</button>
+                    <button class="btn-danger" id="pauseTimerBtn" disabled>Pausar</button>
+                    <button class="btn-light" id="resetTimerBtn" disabled>Reiniciar tiempo</button>
+                </div>
+
+                <div class="count" id="remainingCount">Quedan 22 estudiantes · 66 preguntas</div>
+            </div>
+        </div>
+
+        <details>
+            <summary>Ver estudiantes de la ronda</summary>
+            <ol id="studentList"></ol>
+        </details>
+
+        <details>
+            <summary>Ver números de preguntas restantes</summary>
+            <p id="remainingQuestionsText"></p>
+        </details>
+
+        <div class="footer">
+            La ruleta elimina automáticamente a cada estudiante seleccionado/a. Cada estudiante recibe 3 números de pregunta entre 1 y 66, sin repetirlos durante la ronda. El temporizador se reinicia a 3:00 con cada nuevo giro.
+        </div>
+    </div>
+</div>
+
+<script>
+const initialStudents = ["Aranda Abril", "Arrieta Feliciana", "Ávila María", "Buera Enzo", "Cáseres Jose", "Cadamartori Yael", "Chambi Madelen", "Enrique Abi", "Espíritu Abeys", "Galvan Camila", "Gauna Joan", "Herrera Verónica", "Lapa Jesús", "Luna Guillermina", "Maguiña Érica", "Monzón Valentina", "Ojeda Mélany", "Palacecino María", "Ramos Marcelo", "Scarinci Ludmila", "Suárez Lautaro", "Taborga Magdalena"];
+let remainingStudents = [...initialStudents];
+let usedStudents = [];
+let remainingQuestionNumbers = Array.from({ length: 66 }, (_, i) => i + 1);
+let usedQuestionNumbers = [];
+let currentRotation = 0;
+
+let timeLeft = 180;
+let timerInterval = null;
+let currentStudentSelected = false;
+
+const colors = [
+    "#ffd166", "#06d6a0", "#118ab2", "#ef476f", "#cdb4db", "#a7c957",
+    "#f9844a", "#90dbf4", "#f9c74f", "#43aa8b", "#577590", "#ffafcc"
+];
+
+const wheel = document.getElementById("wheel");
+const spinBtn = document.getElementById("spinBtn");
+const resetBtn = document.getElementById("resetBtn");
+const studentName = document.getElementById("studentName");
+const remainingCount = document.getElementById("remainingCount");
+const studentList = document.getElementById("studentList");
+const questionNumbers = document.getElementById("questionNumbers");
+const remainingQuestionsText = document.getElementById("remainingQuestionsText");
+
+const timer = document.getElementById("timer");
+const startTimerBtn = document.getElementById("startTimerBtn");
+const pauseTimerBtn = document.getElementById("pauseTimerBtn");
+const resetTimerBtn = document.getElementById("resetTimerBtn");
+
+function renderWheel() {
+    wheel.innerHTML = "";
+    const n = remainingStudents.length || 1;
+    const angle = 360 / n;
+
+    let gradient = "";
+    for (let i = 0; i < n; i++) {
+        const start = i * angle;
+        const end = (i + 1) * angle;
+        gradient += `${colors[i % colors.length]} ${start}deg ${end}deg${i === n - 1 ? "" : ", "}`;
+    }
+    wheel.style.background = `conic-gradient(${gradient})`;
+
+    if (remainingStudents.length === 0) {
+        const done = document.createElement("div");
+        done.className = "label";
+        done.style.transform = "rotate(0deg) translate(72px, -7px)";
+        done.textContent = "Ronda completa";
+        wheel.appendChild(done);
+        return;
+    }
+
+    for (let i = 0; i < n; i++) {
+        const label = document.createElement("div");
+        label.className = "label";
+        const mid = i * angle + angle / 2;
+        label.style.transform = `rotate(${mid}deg) translate(78px, -7px)`;
+        label.textContent = remainingStudents[i];
+        wheel.appendChild(label);
+    }
+}
+
+function renderList() {
+    studentList.innerHTML = "";
+    initialStudents.forEach(s => {
+        const li = document.createElement("li");
+        li.textContent = s;
+        if (usedStudents.includes(s)) li.className = "done";
+        studentList.appendChild(li);
+    });
+
+    remainingCount.textContent = `Quedan ${remainingStudents.length} estudiantes · ${remainingQuestionNumbers.length} preguntas`;
+    remainingQuestionsText.textContent = remainingQuestionNumbers.length
+        ? remainingQuestionNumbers.join(", ")
+        : "No quedan preguntas disponibles. Ronda completa.";
+}
+
+function renderQuestionNumbers(numbers) {
+    questionNumbers.innerHTML = "";
+    numbers.forEach(n => {
+        const div = document.createElement("div");
+        div.className = "number-chip";
+        div.textContent = n;
+        questionNumbers.appendChild(div);
+    });
+}
+
+function resetQuestionNumberDisplay() {
+    questionNumbers.innerHTML = `
+        <div class="number-chip">--</div>
+        <div class="number-chip">--</div>
+        <div class="number-chip">--</div>
+    `;
+}
+
+function drawQuestionNumbers(count = 3) {
+    const drawn = [];
+    for (let i = 0; i < count; i++) {
+        const idx = Math.floor(Math.random() * remainingQuestionNumbers.length);
+        const number = remainingQuestionNumbers.splice(idx, 1)[0];
+        drawn.push(number);
+        usedQuestionNumbers.push(number);
+    }
+    return drawn.sort((a, b) => a - b);
+}
+
+function updateTimerDisplay() {
+    const minutes = String(Math.floor(timeLeft / 60)).padStart(2, "0");
+    const seconds = String(timeLeft % 60).padStart(2, "0");
+    timer.textContent = `${minutes}:${seconds}`;
+}
+
+function stopTimer() {
+    if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+    }
+}
+
+function resetTimer() {
+    stopTimer();
+    timeLeft = 180;
+    timer.classList.remove("timer-ended");
+    updateTimerDisplay();
+    startTimerBtn.textContent = "Iniciar 3 minutos";
+    if (currentStudentSelected) {
+        startTimerBtn.disabled = false;
+        pauseTimerBtn.disabled = true;
+        resetTimerBtn.disabled = false;
+    } else {
+        startTimerBtn.disabled = true;
+        pauseTimerBtn.disabled = true;
+        resetTimerBtn.disabled = true;
+    }
+}
+
+function beep() {
+    try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const ctx = new AudioContext();
+        const oscillator = ctx.createOscillator();
+        const gain = ctx.createGain();
+        oscillator.connect(gain);
+        gain.connect(ctx.destination);
+        oscillator.frequency.value = 880;
+        oscillator.type = "sine";
+        gain.gain.setValueAtTime(0.12, ctx.currentTime);
+        oscillator.start();
+        oscillator.stop(ctx.currentTime + 0.5);
+    } catch(e) {}
+}
+
+function startTimer() {
+    if (!currentStudentSelected || timeLeft <= 0) return;
+    stopTimer();
+    timer.classList.remove("timer-ended");
+    startTimerBtn.disabled = true;
+    pauseTimerBtn.disabled = false;
+    resetTimerBtn.disabled = false;
+
+    timerInterval = setInterval(() => {
+        timeLeft--;
+        updateTimerDisplay();
+
+        if (timeLeft <= 0) {
+            stopTimer();
+            timer.classList.add("timer-ended");
+            startTimerBtn.disabled = true;
+            pauseTimerBtn.disabled = true;
+            resetTimerBtn.disabled = false;
+            beep();
+        }
+    }, 1000);
+}
+
+function pauseTimer() {
+    stopTimer();
+    if (currentStudentSelected && timeLeft > 0) {
+        startTimerBtn.textContent = "Continuar";
+        startTimerBtn.disabled = false;
+        pauseTimerBtn.disabled = true;
+    }
+}
+
+function spin() {
+    if (remainingStudents.length === 0 || remainingQuestionNumbers.length < 3) {
+        studentName.textContent = "Ronda completa";
+        spinBtn.disabled = true;
+        currentStudentSelected = false;
+        resetTimer();
+        return;
+    }
+
+    stopTimer();
+    currentStudentSelected = false;
+    resetTimer();
+    resetQuestionNumberDisplay();
+    spinBtn.disabled = true;
+
+    const n = remainingStudents.length;
+    const selectedIndex = Math.floor(Math.random() * n);
+
+    const anglePer = 360 / n;
+    const targetAngle = selectedIndex * anglePer + anglePer / 2;
+    const pointerAngle = 270;
+    const spins = 5 + Math.floor(Math.random() * 3);
+    const finalRotation = currentRotation + spins * 360 + (pointerAngle - targetAngle);
+    currentRotation = finalRotation;
+    wheel.style.transform = `rotate(${finalRotation}deg)`;
+
+    setTimeout(() => {
+        const selectedStudent = remainingStudents.splice(selectedIndex, 1)[0];
+        const drawnNumbers = drawQuestionNumbers(3);
+
+        usedStudents.push(selectedStudent);
+        studentName.textContent = selectedStudent;
+        renderQuestionNumbers(drawnNumbers);
+
+        currentStudentSelected = true;
+        resetTimer();
+
+        renderWheel();
+        wheel.style.transition = "none";
+        wheel.style.transform = "rotate(0deg)";
+        currentRotation = 0;
+
+        setTimeout(() => {
+            wheel.style.transition = "transform 4s cubic-bezier(.12,.82,.18,1)";
+        }, 50);
+
+        renderList();
+        spinBtn.disabled = remainingStudents.length === 0 || remainingQuestionNumbers.length < 3;
+    }, 4200);
+}
+
+function resetAll() {
+    stopTimer();
+    remainingStudents = [...initialStudents];
+    usedStudents = [];
+    remainingQuestionNumbers = Array.from({ length: 66 }, (_, i) => i + 1);
+    usedQuestionNumbers = [];
+    currentRotation = 0;
+    currentStudentSelected = false;
+    wheel.style.transform = "rotate(0deg)";
+    studentName.textContent = "Presioná “Girar ruleta”";
+    resetQuestionNumberDisplay();
+    spinBtn.disabled = false;
+    resetTimer();
+    renderWheel();
+    renderList();
+}
+
+spinBtn.addEventListener("click", spin);
+resetBtn.addEventListener("click", resetAll);
+startTimerBtn.addEventListener("click", startTimer);
+pauseTimerBtn.addEventListener("click", pauseTimer);
+resetTimerBtn.addEventListener("click", resetTimer);
+
+renderWheel();
+renderList();
+resetTimer();
+</script>
+</body>
+</html>
